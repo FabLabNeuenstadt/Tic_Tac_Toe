@@ -75,21 +75,13 @@ void InitIO( void )
   }
 }
 
-// Um alle LEDs auszuschalten, müssen die damit verbundenen Pins auf LOW gesetzt werden.
+// Um alle LEDs auszuschalten, müssen die damit verbundenen Anoden auf HIGH (falls durch einen Transistor invertiert) bzw. LOW gesetzt werden.
 void AllesAus( void )
 {
-  for (int pin = 2; pin < 15; pin++)
-  {
-    // Der Pin 11 muss aber auf HIGH gesetzt werden, weil er nicht mit einem Transistor verbunden ist
-    if( pin != 11)
-    {
-      digitalWrite(pin, HIGH);
-    }
-    else
-    {
-      digitalWrite(pin, LOW);
-    }
-  }
+  digitalWrite(6, HIGH);
+  digitalWrite(9, HIGH);
+  digitalWrite(10, HIGH);
+  digitalWrite(11, LOW);
 }
 
 //  Zu Beginn eines Spiels werden alle Variablen auf ihren Standardwert gesetzt
@@ -175,18 +167,9 @@ void AusgabeStatusLED( void )
   // Je nachdem, welcher Spieler gerade dran ist, leuchtet die LED in einer bestimmten Farbe
   switch (AktiverSpieler)
   {
-    case 0: // Alle Farben aus
-        SetLED(9, 0, 0, 0);
-        break;
-      case 1: // Rot
-        SetLED(9, 255, 0, 0);
-        break;
-      case 2: // Grün
-        SetLED(9, 0, 255, 0);
-        break;
-      case 3: // Blau
-        SetLED(9, 0, 0, 255);
-        break;
+    case 0: SetLED(9,   0,   0,   0); break; // Alle Farben aus
+    case 1: SetLED(9, 255,   0,   0); break; // Rot
+    case 2: SetLED(9,   0, 255,   0); break; // Grün
   }
 }
 
@@ -197,9 +180,9 @@ void AusgabeLEDs()
   {
     switch ( Spielfeld[feld] )
     {
-      case 0: SetLED(feld,   0,   0,   0); break;
-      case 1: SetLED(feld, 255,   0,   0); break;
-      case 2: SetLED(feld,   0, 255,   0); break;
+      case 0: SetLED(feld,   0,   0,   0); break; // Alle Farben aus
+      case 1: SetLED(feld, 255,   0,   0); break; // Rot
+      case 2: SetLED(feld,   0, 255,   0); break; // Grün
     }
   }
 }
