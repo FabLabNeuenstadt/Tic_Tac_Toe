@@ -1,12 +1,70 @@
 #define BUTTON_PIN A7
 #define DEBUG 0
 
+struct RGB {
+  byte r;
+  byte g;
+  byte b;
+};
+
 // Die 9 Felder des Spielfelds.
 // Werte: 0 => Noch niemand das Feld belegt
 //        1 => Spieler 1 hat das Feld belegt
 //        2 => Spieler 2 hat das Feld belegt
 short Spielfeld[9];
 short AktiverSpieler = 0;
+
+void SetLED( int num, byte r, byte g, byte b) {
+  int anode; // gemeinsame Anode der LED
+  RGB kathode;
+  if (num >= 0 && num <= 8)
+  {
+    // Spielfeld-LED
+    int zeile = num / 3;
+    int spalte = num % 3;
+    switch(zeile)
+    {
+      case 0: anode = 10; break;
+      case 1: anode = 9; break;
+      case 2: anode = 6; break;
+    }
+    switch(spalte)
+    {
+      case 0: kathode.r =  2; kathode.g =  3; kathode.b =  4; break;
+      case 1: kathode.r =  8; kathode.g =  7; kathode.b =  5; break;
+      case 2: kathode.r = 12; kathode.g = A0; kathode.b = 13; break;
+    }
+    // Der PIN, der die Anode ansteuert, muss wegen Transistoren invertiert werden
+    analogWrite(anode, 255 - r);
+    digitalWrite(kathode.r, LOW);
+    delay(1);
+    analogWrite(anode, 255 - g);
+    digitalWrite(kathode.g, LOW);
+    delay(1);
+    analogWrite(anode, 255 - b);
+    digitalWrite(kathode.b, LOW);
+    delay(1);
+    digitalWrite(anode, HIGH);
+  }
+  else if (num == 9)
+  {
+    // Status-LED
+    anode = 11;
+    kathode.r = 8;
+    kathode.g = 7;
+    kathode.b = 5;
+    analogWrite(anode, r);
+    digitalWrite(kathode.r, LOW);
+    delay(1);
+    analogWrite(anode, g);
+    digitalWrite(kathode.g, LOW);
+    delay(1);
+    analogWrite(anode, b);
+    digitalWrite(kathode.b, LOW);
+    delay(1);
+    analogWrite(anode, 0);
+  }
+}
 
 // Alle Pins, die mit den LEDs verbunden sind, auf Ausgang setzen
 void InitIO( void )
@@ -117,135 +175,32 @@ void AusgabeStatusLED( void )
   // Je nachdem, welcher Spieler gerade dran ist, leuchtet die LED in einer bestimmten Farbe
   switch (AktiverSpieler)
   {
-    case 0: // Allle Farben aus
-        digitalWrite(5, HIGH);
-        digitalWrite(7, HIGH);
-        digitalWrite(8, HIGH);
+    case 0: // Alle Farben aus
+        SetLED(9, 0, 0, 0);
         break;
       case 1: // Rot
-        digitalWrite(5, LOW);
-        digitalWrite(7, HIGH);
-        digitalWrite(8, HIGH);
+        SetLED(9, 255, 0, 0);
         break;
-      case 2: // Gruen
-        digitalWrite(5, HIGH);
-        digitalWrite(7, LOW);
-        digitalWrite(8, HIGH);
+      case 2: // Grün
+        SetLED(9, 0, 255, 0);
         break;
       case 3: // Blau
-        digitalWrite(5, HIGH);
-        digitalWrite(7, HIGH);
-        digitalWrite(8, LOW);
+        SetLED(9, 0, 0, 255);
         break;
   }
-
-  // Setze die gemeinsame Kathode auf HIGH und schalte die LED somit an
-  digitalWrite(11, HIGH);
-
-  // Warte eine Millisekunde
-  delay(1);
-
-  // Schalte die LED aus
-  digitalWrite(11, LOW);
-
-  AllesAus();
 }
 
 // Diese Funktion gibt den Inhalt des Arrays Spielfeld auf der LED Matrix aus.
 void AusgabeLEDs()
 {
-  // Das wird für alle 3 Zeilen widerholt
-  for(int zeile = 0; zeile < 3; zeile++)
+  for (int feld = 0; feld < 9; feld++)
   {
-    // Prüfe die LEDs 0, 3 und 6
-    switch ( Spielfeld[ 3*zeile ] )
+    switch ( Spielfeld[feld] )
     {
-      case 0: // alle Farben aus
-        digitalWrite(2, HIGH);
-        digitalWrite(3, HIGH);
-        digitalWrite(4, HIGH);
-        break;
-      case 1: // Rot
-        digitalWrite(2, LOW);
-        digitalWrite(3, HIGH);
-        digitalWrite(4, HIGH);
-        break;
-      case 2: // Gruen
-        digitalWrite(2, HIGH);
-        digitalWrite(3, LOW);
-        digitalWrite(4, HIGH);
-        break;
-      case 3: // Blau
-        digitalWrite(2, HIGH);
-        digitalWrite(3, HIGH);
-        digitalWrite(4, LOW);
-        break;
+      case 0: SetLED(feld,   0,   0,   0); break;
+      case 1: SetLED(feld, 255,   0,   0); break;
+      case 2: SetLED(feld,   0, 255,   0); break;
     }
-
-    // Pruefe die LEDs 1, 4 und 7
-    switch ( Spielfeld[ 3*zeile + 1 ] )
-    {
-      case 0: // alle Farben aus
-        digitalWrite(5, HIGH);
-        digitalWrite(7, HIGH);
-        digitalWrite(8, HIGH);
-        break;
-      case 1: // Rot
-        digitalWrite(5, LOW);
-        digitalWrite(7, HIGH);
-        digitalWrite(8, HIGH);
-        break;
-      case 2: // Gruen
-        digitalWrite(5, HIGH);
-        digitalWrite(7, LOW);
-        digitalWrite(8, HIGH);
-        break;
-      case 3: // Blau
-        digitalWrite(5, HIGH);
-        digitalWrite(7, HIGH);
-        digitalWrite(8, LOW);
-        break;
-    }
-
-    // Pruefe die LEDs 2, 5 und 8
-    switch ( Spielfeld[ 3*zeile + 2 ] )
-    {
-      case 0: // alle Farben aus
-        digitalWrite(11, HIGH);
-        digitalWrite(12, HIGH);
-        digitalWrite(13, HIGH);
-        break;
-      case 1: // Rot
-        digitalWrite(11, LOW);
-        digitalWrite(12, HIGH);
-        digitalWrite(13, HIGH);
-        break;
-      case 2: // Gruen
-        digitalWrite(11, HIGH);
-        digitalWrite(12, LOW);
-        digitalWrite(13, HIGH);
-        break;
-      case 3: // Blau
-        digitalWrite(11, HIGH);
-        digitalWrite(12, HIGH);
-        digitalWrite(13, LOW);
-        break;
-    }
-
-    // Schalte die dazugehörigr gemeinsame Kathode an.
-    // Die Zustände an den Kathoden werden durch den Transistor invertiert
-    switch(zeile)
-    {
-      case 0: digitalWrite(6, LOW); break;
-      case 1: digitalWrite(9, LOW); break;
-      case 2: digitalWrite(10, LOW); break;
-    }
-
-    // warte eine Millisekunde
-    delay(1);
-
-    // Schalte die LED Matrix wieder aus
-    AllesAus();
   }
 }
 
