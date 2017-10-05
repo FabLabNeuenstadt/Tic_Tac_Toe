@@ -38,12 +38,15 @@ void SetLED( int num, byte r, byte g, byte b) {
     analogWrite(anode, 255 - r);
     digitalWrite(kathode.r, LOW);
     delay(1);
+    digitalWrite(kathode.r, HIGH);
     analogWrite(anode, 255 - g);
     digitalWrite(kathode.g, LOW);
     delay(1);
+    digitalWrite(kathode.g, HIGH);
     analogWrite(anode, 255 - b);
     digitalWrite(kathode.b, LOW);
     delay(1);
+    digitalWrite(kathode.b, HIGH);
     digitalWrite(anode, HIGH);
   }
   else if (num == 9)
@@ -56,12 +59,15 @@ void SetLED( int num, byte r, byte g, byte b) {
     analogWrite(anode, r);
     digitalWrite(kathode.r, LOW);
     delay(1);
+    digitalWrite(kathode.r, HIGH);
     analogWrite(anode, g);
     digitalWrite(kathode.g, LOW);
     delay(1);
+    digitalWrite(kathode.g, HIGH);
     analogWrite(anode, b);
     digitalWrite(kathode.b, LOW);
     delay(1);
+    digitalWrite(kathode.b, HIGH);
     analogWrite(anode, 0);
   }
 }
