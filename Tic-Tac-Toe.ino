@@ -34,20 +34,16 @@ void SetLED( int num, byte r, byte g, byte b) {
       case 1: kathode.r =  8; kathode.g =  7; kathode.b =  5; break;
       case 2: kathode.r = 12; kathode.g = A0; kathode.b = 13; break;
     }
+    digitalWrite(kathode.r, (r ? LOW : HIGH));
+    digitalWrite(kathode.g, (g ? LOW : HIGH));
+    digitalWrite(kathode.b, (b ? LOW : HIGH));
     // Der PIN, der die Anode ansteuert, muss wegen Transistoren invertiert werden
-    analogWrite(anode, 255 - r);
-    digitalWrite(kathode.r, LOW);
+    digitalWrite(anode, LOW);
     delay(1);
-    digitalWrite(kathode.r, HIGH);
-    analogWrite(anode, 255 - g);
-    digitalWrite(kathode.g, LOW);
-    delay(1);
-    digitalWrite(kathode.g, HIGH);
-    analogWrite(anode, 255 - b);
-    digitalWrite(kathode.b, LOW);
-    delay(1);
-    digitalWrite(kathode.b, HIGH);
     digitalWrite(anode, HIGH);
+    digitalWrite(kathode.r, HIGH);
+    digitalWrite(kathode.g, HIGH);
+    digitalWrite(kathode.b, HIGH);
   }
   else if (num == 9)
   {
@@ -56,19 +52,16 @@ void SetLED( int num, byte r, byte g, byte b) {
     kathode.r = 8;
     kathode.g = 7;
     kathode.b = 5;
-    analogWrite(anode, r);
-    digitalWrite(kathode.r, LOW);
+    digitalWrite(kathode.r, (r ? LOW : HIGH));
+    digitalWrite(kathode.g, (g ? LOW : HIGH));
+    digitalWrite(kathode.b, (b ? LOW : HIGH));
+    // Der PIN, der die Anode ansteuert, muss wegen Transistoren invertiert werden
+    analogWrite(anode, HIGH);
     delay(1);
+    analogWrite(anode, LOW);
     digitalWrite(kathode.r, HIGH);
-    analogWrite(anode, g);
-    digitalWrite(kathode.g, LOW);
-    delay(1);
     digitalWrite(kathode.g, HIGH);
-    analogWrite(anode, b);
-    digitalWrite(kathode.b, LOW);
-    delay(1);
     digitalWrite(kathode.b, HIGH);
-    analogWrite(anode, 0);
   }
 }
 
