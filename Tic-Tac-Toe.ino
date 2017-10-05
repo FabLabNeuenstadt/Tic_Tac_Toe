@@ -177,11 +177,16 @@ void AusgabeLEDs()
 {
   for (int feld = 0; feld < 9; feld++)
   {
+    // Das Spielfeld ist im Vergleich zu der Diodennummerierung um 90° gedreht
+    // Deshalb müssen Zeilen und Spalten vor der Ausgabe getauscht werden
+    int zeile = feld / 3;
+    int spalte = feld % 3;
+    int diode = spalte * 3 + zeile;
     switch ( Spielfeld[feld] )
     {
-      case 0: SetLED(feld,   0,   0,   0); break; // Alle Farben aus
-      case 1: SetLED(feld, 255,   0,   0); break; // Rot
-      case 2: SetLED(feld,   0, 255,   0); break; // Grün
+      case 0: SetLED(diode,   0,   0,   0); break; // Alle Farben aus
+      case 1: SetLED(diode, 255,   0,   0); break; // Rot
+      case 2: SetLED(diode,   0, 255,   0); break; // Grün
     }
   }
 }
