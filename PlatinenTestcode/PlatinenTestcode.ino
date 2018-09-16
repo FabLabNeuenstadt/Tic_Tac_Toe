@@ -201,13 +201,13 @@ void loop() {
   if (taste) {
     if (farbwechsel == 0) {
       SetzeLED(TasteZuLED(taste), 255, 0, 0);
-      SetzeLED(10, 255, 0, 0);
+      SetzeLED(10, 0, 255, 0);
     } else if (farbwechsel == 1) {
       SetzeLED(TasteZuLED(taste), 0, 255, 0);
-      SetzeLED(10, 0, 255, 0);
+      SetzeLED(10, 0, 0, 255);
     } else if (farbwechsel == 2) {
       SetzeLED(TasteZuLED(taste), 0, 0, 255);
-      SetzeLED(10, 0, 0, 255);
+      SetzeLED(10, 255, 0, 0);
     }
     if (taste != letzteTaste) {
       farbwechsel++;
