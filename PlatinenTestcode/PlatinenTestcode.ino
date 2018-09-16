@@ -5,8 +5,8 @@ int farbwechsel = 0;
 
 int letzteTaste = 0;
 
-int TasteZuLED( int button ) {
-    switch (button) {
+int TasteZuLED( int taste ) {
+    switch (taste) {
       case 1: return 3;
       case 2: return 2;
       case 3: return 1;
