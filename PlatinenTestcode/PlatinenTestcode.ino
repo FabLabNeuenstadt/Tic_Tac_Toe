@@ -52,7 +52,7 @@ void SetLED( int LED, byte r, byte g, byte b) {
     digitalWrite(kathode.b, (b ? LOW : HIGH));
     // Der PIN, der die Anode ansteuert, muss wegen Transistoren invertiert werden
     digitalWrite(anode, LOW);
-    delay(10);
+    delay(1);
     digitalWrite(anode, HIGH);
     digitalWrite(kathode.r, HIGH);
     digitalWrite(kathode.g, HIGH);
@@ -69,9 +69,9 @@ void SetLED( int LED, byte r, byte g, byte b) {
     digitalWrite(kathode.g, (g ? LOW : HIGH));
     digitalWrite(kathode.b, (b ? LOW : HIGH));
     // Der PIN, der diese Anode ansteuert, hat keinen Transistor
-    analogWrite(anode, HIGH);
-    delay(10);
-    analogWrite(anode, LOW);
+    digitalWrite(anode, HIGH);
+    delay(1);
+    digitalWrite(anode, LOW);
     digitalWrite(kathode.r, HIGH);
     digitalWrite(kathode.g, HIGH);
     digitalWrite(kathode.b, HIGH);
@@ -161,15 +161,15 @@ void setup() {
   }
   for (int i = 1; i < 11; i++) {
     SetLED(i, 255, 0, 0);
-    delay(200);
+    delay(100);
   }
   for (int i = 1; i < 11; i++) {
     SetLED(i, 0, 255, 0);
-    delay(200);
+    delay(100);
   }
   for (int i = 1; i < 11; i++) {
     SetLED(i, 0, 0, 255);
-    delay(200);
+    delay(100);
   }
 }
 
