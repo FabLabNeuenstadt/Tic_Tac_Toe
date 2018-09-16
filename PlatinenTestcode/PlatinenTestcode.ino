@@ -1,16 +1,11 @@
 #define BUTTON_PIN A7
 #define DEBUG 0
 
-struct RGB {
-  byte r;
-  byte g;
-  byte b;
-};
+int farbwechsel = 0;
 
-int cycle = 0;
 int letzteTaste = 0;
 
-int Taste2LED( int button ) {
+int TasteZuLED( int button ) {
     switch (button) {
       case 1: return 3;
       case 2: return 2;
@@ -26,10 +21,14 @@ int Taste2LED( int button ) {
 }
 
 
-void SetLED( int LED, byte r, byte g, byte b) {
+void SetzeLED( int led, byte r, byte g, byte b) {
   int anode; // gemeinsame Anode der LED
-  RGB kathode;
-  int num = LED - 1;
+  byte kathodeR;
+  byte kathodeG;
+  byte kathodeB;
+  
+  //RGB kathode;
+  int num = led - 1;
   if (num >= 0 && num <= 8)
   {
     // Spielfeld-LED
@@ -37,54 +36,76 @@ void SetLED( int LED, byte r, byte g, byte b) {
     int spalte = num / 3;
     switch(zeile)
     {
-      case 0: anode = 10; break;
-      case 1: anode = 9; break;
-      case 2: anode = 6; break;
+      case 0: anode = 10; if (DEBUG) Serial.print("z1"); break;
+      case 1: anode = 9;  if (DEBUG) Serial.print("z2"); break;
+      case 2: anode = 6;  if (DEBUG) Serial.print("z3"); break;
     }
     switch(spalte)
     {
-      case 0: kathode.r = 12; kathode.g = A0; kathode.b = 13; break;
-      case 1: kathode.r =  8; kathode.g =  7; kathode.b =  5; break;
-      case 2: kathode.r =  2; kathode.g =  3; kathode.b =  4; break;
+      case 0: kathodeR = 12; kathodeG = A0; kathodeB = 13; if (DEBUG) Serial.println("s1"); break;
+      case 1: kathodeR =  8; kathodeG =  7; kathodeB =  5; if (DEBUG) Serial.println("s2"); break;
+      case 2: kathodeR =  2; kathodeG =  3; kathodeB =  4; if (DEBUG) Serial.println("s3"); break;
     }
-    digitalWrite(kathode.r, (r ? LOW : HIGH));
-    digitalWrite(kathode.g, (g ? LOW : HIGH));
-    digitalWrite(kathode.b, (b ? LOW : HIGH));
+
     // Der PIN, der die Anode ansteuert, muss wegen Transistoren invertiert werden
-    digitalWrite(anode, LOW);
+    digitalWrite(anode, HIGH);
+    digitalWrite(kathodeR, (r ? LOW : HIGH));
+    analogWrite(anode, 255-r);
     delay(1);
     digitalWrite(anode, HIGH);
-    digitalWrite(kathode.r, HIGH);
-    digitalWrite(kathode.g, HIGH);
-    digitalWrite(kathode.b, HIGH);
+    digitalWrite(kathodeG, (g ? LOW : HIGH));
+    analogWrite(anode, 255-g);
+    delay(1);
+    digitalWrite(anode, HIGH);
+    digitalWrite(kathodeB, (b ? LOW : HIGH));
+    analogWrite(anode, 255-b);
+    delay(1);
+    digitalWrite(anode, HIGH);
+
+/*    digitalWrite(anode, LOW);
+    delay(1);
+    digitalWrite(anode, HIGH);*/
+    digitalWrite(kathodeR, HIGH);
+    digitalWrite(kathodeG, HIGH);
+    digitalWrite(kathodeB, HIGH);
   }
   else if (num == 9)
   {
     // Status-LED
     anode = 11;
-    kathode.r = 8;
-    kathode.g = 7;
-    kathode.b = 5;
-    digitalWrite(kathode.r, (r ? LOW : HIGH));
-    digitalWrite(kathode.g, (g ? LOW : HIGH));
-    digitalWrite(kathode.b, (b ? LOW : HIGH));
+    kathodeR = 8;
+    kathodeG = 7;
+    kathodeB = 5;
+
     // Der PIN, der diese Anode ansteuert, hat keinen Transistor
-    digitalWrite(anode, HIGH);
+
+    digitalWrite(anode, LOW);
+    digitalWrite(kathodeR, (r ? LOW : HIGH));
+    analogWrite(anode, r);
     delay(1);
     digitalWrite(anode, LOW);
-    digitalWrite(kathode.r, HIGH);
-    digitalWrite(kathode.g, HIGH);
-    digitalWrite(kathode.b, HIGH);
+    digitalWrite(kathodeG, (g ? LOW : HIGH));
+    analogWrite(anode, g);
+    delay(1);
+    digitalWrite(anode, LOW);
+    digitalWrite(kathodeB, (b ? LOW : HIGH));
+    analogWrite(anode, b);
+    delay(1);
+    digitalWrite(anode, LOW);
+    digitalWrite(kathodeR, HIGH);
+    digitalWrite(kathodeG, HIGH);
+    digitalWrite(kathodeB, HIGH);
   }
 }
 
 // Alle Pins, die mit den LEDs verbunden sind, auf Ausgang setzen
-void InitIO( void )
+void InitEA( void )
 {
-  for (int pin = 2; pin < 15; pin++)
+  for (int pin = 2; pin < 14; pin++)
   {
     pinMode(pin, OUTPUT);
   }
+  pinMode(A0, OUTPUT);
 }
 
 // Um alle LEDs auszuschalten, müssen die damit verbundenen Anoden auf HIGH (falls durch einen Transistor invertiert) bzw. LOW gesetzt werden.
@@ -118,7 +139,7 @@ int TasteGedrueckt( void )
 
   int ADC_Wert = analogRead( A7 );
 
-  // Im Folgenen werden die Werte des AD-Wandlers verglichen. daraus wird dann ermittelt, welche taste gedrückt wird
+  // Im Folgenen werden die Werte des AD-Wandlers verglichen. daraus wird dann ermittelt, welche Taste gedrückt wird
   
   if ( (ADC_Wert > 845) && (ADC_Wert < 860) ) {
     Taste = 1;
@@ -151,44 +172,49 @@ int TasteGedrueckt( void )
   return Taste;
 }
 
-// Die Setup-Funktion wird beim ersten Start aufgerufen
+// Die Setup-Funktion wird nur einmal beim ersten Start aufgerufen
 void setup() {
-  InitIO();
+  InitEA();
   AllesAus();
   if (DEBUG)
   {
     Serial.begin(9600);
   }
   for (int i = 1; i < 11; i++) {
-    SetLED(i, 255, 0, 0);
+    SetzeLED(i, 255, 0, 0);
     delay(100);
   }
   for (int i = 1; i < 11; i++) {
-    SetLED(i, 0, 255, 0);
+    SetzeLED(i, 0, 255, 0);
     delay(100);
   }
   for (int i = 1; i < 11; i++) {
-    SetLED(i, 0, 0, 255);
+    SetzeLED(i, 0, 0, 255);
     delay(100);
   }
 }
 
+// Die Loop-Funktion wird nach der Setup-Funktion in einer Dauerschleife ausgeführt
+
 void loop() {
-  int Taste = TasteGedrueckt();
-  if (Taste) {
-    if (cycle == 0) {
-      SetLED(Taste2LED(Taste), 255, 0, 0);
-      SetLED(10, 255, 0, 0);
-    } else if (cycle == 1) {
-      SetLED(Taste2LED(Taste), 0, 255, 0);
-      SetLED(10, 0, 255, 0);
-    } else if (cycle == 2) {
-      SetLED(Taste2LED(Taste), 0, 0, 255);
-      SetLED(10, 0, 0, 255);
+  int taste = TasteGedrueckt();
+  if (taste) {
+    if (farbwechsel == 0) {
+      SetzeLED(TasteZuLED(taste), 255, 0, 0);
+      SetzeLED(10, 255, 0, 0);
+    } else if (farbwechsel == 1) {
+      SetzeLED(TasteZuLED(taste), 0, 255, 0);
+      SetzeLED(10, 0, 255, 0);
+    } else if (farbwechsel == 2) {
+      SetzeLED(TasteZuLED(taste), 0, 0, 255);
+      SetzeLED(10, 0, 0, 255);
     }
-    if (Taste != letzteTaste) {
-      cycle = ++cycle % 3;
-      letzteTaste = Taste;
+    if (taste != letzteTaste) {
+      farbwechsel++;
+      if (farbwechsel > 2) {
+        farbwechsel = 0;
+      }
+      letzteTaste = taste;
     }
     
   } else {
