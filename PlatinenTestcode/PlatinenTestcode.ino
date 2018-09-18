@@ -181,16 +181,19 @@ void setup() {
     Serial.begin(9600);
   }
   for (int i = 1; i < 11; i++) {
-    SetzeLED(i, 255, 0, 0);
-    delay(100);
+    for(int j = 0; j < 50; j++) {
+      SetzeLED(i, 255, 0, 0);
+    }
   }
   for (int i = 1; i < 11; i++) {
-    SetzeLED(i, 0, 255, 0);
-    delay(100);
+    for(int j = 0; j < 50; j++) {
+      SetzeLED(i, 0, 255, 0);
+    }
   }
   for (int i = 1; i < 11; i++) {
-    SetzeLED(i, 0, 0, 255);
-    delay(100);
+    for(int j = 0; j < 50; j++) {
+      SetzeLED(i, 0, 0, 255);
+    }
   }
 }
 
