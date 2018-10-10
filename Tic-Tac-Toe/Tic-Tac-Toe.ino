@@ -1,5 +1,5 @@
 #define BUTTON_PIN A7
-#define DEBUG true
+#define DEBUG false
 
 // Werte: 0 => Noch niemand hat das Feld belegt
 //        1 => Spieler 1 hat das Feld belegt
