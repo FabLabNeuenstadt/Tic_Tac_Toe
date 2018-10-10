@@ -28,7 +28,7 @@ void ZeigeAnimation(void (*Animation)(byte Schritt), byte SchrittZahl, unsigned 
   
     if(TasteGedrueckt() != KeineKoordinaten && AktuelleZeit >= ZeitTastenfreigabe)
     {
-      InitVariablen();
+      ResetSpiel();
       delay(500);
       return;
     }
