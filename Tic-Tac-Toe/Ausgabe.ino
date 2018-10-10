@@ -63,11 +63,11 @@ void AusgabeStatusLED( void )
   int x = 1;
 
   // Der PIN, der diese Anode ansteuert, hat keinen Transistor
-  digitalWrite(anode, HIGH);
+  digitalWrite(anode, LOW);
   digitalWrite(kathodeRPin[x], (farbe.R ? LOW : HIGH));
   digitalWrite(kathodeGPin[x], (farbe.G ? LOW : HIGH));
   digitalWrite(kathodeBPin[x], (farbe.B ? LOW : HIGH));
-  digitalWrite(anode, LOW);
-  delay(1);
   digitalWrite(anode, HIGH);
+  delay(1);
+  digitalWrite(anode, LOW);
 }
