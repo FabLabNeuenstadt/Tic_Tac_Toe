@@ -1,19 +1,7 @@
 #define BUTTON_PIN A7
 #define DEBUG true
 
-struct RGB {
-  byte R;
-  byte G;
-  byte B;
-};
-
-byte anodePin[3];
-byte kathodeRPin[3];
-byte kathodeGPin[3];
-byte kathodeBPin[3];
-
-// Die 9 Felder des Spielfelds.
-// Werte: 0 => Noch niemand das Feld belegt
+// Werte: 0 => Noch niemand hat das Feld belegt
 //        1 => Spieler 1 hat das Feld belegt
 //        2 => Spieler 2 hat das Feld belegt
 enum Spieler {
@@ -22,6 +10,17 @@ enum Spieler {
   B = 0b00000010
 };
 Spieler Spielfeld[3][3]; // [x][y]
+
+struct RGB {
+  byte R;
+  byte G;
+  byte B;
+};
+
+const byte anodePin[3] = {10, 9, 6};
+const byte kathodeRPin[3] = {12, 8, 2};
+const byte kathodeGPin[3] = {A0, 7, 3};
+const byte kathodeBPin[3] = {13, 5, 4};
 
 RGB Bild[3][3];
 
@@ -121,23 +120,7 @@ Spieler PruefeGewinner()
 
 // Die Setup-Funktion wird beim ersten Start aufgerufen
 void setup()
-{
-  // Kathoden der Spalten sind gleich
-  kathodeRPin[0] = 12;
-  kathodeRPin[1] =  8;
-  kathodeRPin[2] =  2;
-  kathodeGPin[0] = A0;
-  kathodeGPin[1] =  7;
-  kathodeGPin[2] =  3;
-  kathodeBPin[0] = 13;
-  kathodeBPin[1] =  5;
-  kathodeBPin[2] =  4;
-
-  // Anoden der Zeilen sind gleich
-  anodePin[0] = 10;
-  anodePin[1] =  9;
-  anodePin[2] =  6;
-  
+{  
   InitEA();
   InitVariablen();
   LedAusgabe();
