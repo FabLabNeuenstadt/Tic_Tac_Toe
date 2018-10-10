@@ -1,6 +1,51 @@
 void SpielGewonnen(Spieler Gewinner)
 {
-  InitVariablen();
+  const unsigned long SchrittDauer = 250;
+  
+  byte AnimationsSchritt = 0;
+  unsigned long BeginLetzterSchritt = millis();
+
+  unsigned long ZeitTastenfreigabe = millis() + 500;
+
+  while(true)
+  {
+    unsigned long AktuelleZeit = millis();
+    
+    LeereBild();
+  
+    switch(AnimationsSchritt)
+    {
+    case 0:
+    break;
+    case 1:
+      Bild[1][1] = GetSpielerfarbe(Gewinner);
+    break;
+    case 2:
+      for(byte x = 0; x < 3; x++)
+        for(byte y = 0; y < 3; y++)
+          if(x!=1 || y!=1) // alle außer außer die mittlere LED
+            Bild[x][y] = GetSpielerfarbe(Gewinner);
+    break;
+    }
+  
+    if(AktuelleZeit >= BeginLetzterSchritt + SchrittDauer)
+    {
+      AnimationsSchritt++;
+      if(AnimationsSchritt>2)
+        AnimationsSchritt = 0; 
+  
+      BeginLetzterSchritt = AktuelleZeit;
+    }
+  
+    LedAusgabe();
+  
+    if(TasteGedrueckt() != KeineKoordinaten && AktuelleZeit >= ZeitTastenfreigabe)
+    {
+      InitVariablen();
+      delay(500);
+      return;
+    }
+  }
 }
 
 void SpielUnentschieden()
