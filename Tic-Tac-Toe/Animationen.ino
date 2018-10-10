@@ -1,4 +1,14 @@
-// Falls das Spiel gewonnen wurde, zeige eine dazugehörige Animation
+void SpielGewonnen(Spieler Gewinner)
+{
+  InitVariablen();
+}
+
+void SpielUnentschieden()
+{
+  InitVariablen();
+}
+
+/*// Falls das Spiel gewonnen wurde, zeige eine dazugehörige Animation
 void SpielGewonnen( int Gewinner )
 {
   bool neuesSpiel = false;
@@ -117,4 +127,4 @@ void SpielUnentschieden( void )
 
   AllesAus();
   InitVariablen();
-}
+}*/

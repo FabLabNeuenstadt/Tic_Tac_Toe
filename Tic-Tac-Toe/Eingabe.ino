@@ -1,42 +1,33 @@
-// Diese Funktion liefert zurück, welche Taste aktuell gedrückt wird.
-// Alle Tasten bilden einen Spannungsteiler, mit dem das Verhältnis der Widerstände zueinander über einen AD-Wandler ausgelesen wird.
-// Falls keine Taste gedrückt wird, zieht der Pulldown-Widerstand die Spannung auf 0V
-int TasteGedrueckt( void )
+// ermittelt die aktuell gedrückte Taste
+Koordinaten TasteGedrueckt()
 {
-  // 0 bedeutet, dass keine Taste gedrückt wird
-  int taste = 0;
+  int ADC_Wert = analogRead(A7);
 
-  int ADC_Wert = analogRead( A7 );
-
-  // Im Folgenen werden die Werte des AD-Wandlers verglichen. daraus wird dann ermittelt, welche Taste gedrückt wird
-  
-  if ( (ADC_Wert > 845) && (ADC_Wert < 860) ) {
-    taste = 1;
-  } else if ( (ADC_Wert > 725) && (ADC_Wert < 735) ) {
-    taste = 2;
-  } else if ( (ADC_Wert > 635) && (ADC_Wert < 645) ) {
-    taste = 3;
-  } else if ( (ADC_Wert > 560) && (ADC_Wert < 570) ) {
-    taste = 4;
-  } else if ( (ADC_Wert > 500) && (ADC_Wert < 515) ) {
-    taste = 5;
-  } else if ( (ADC_Wert > 460) && (ADC_Wert < 470) ) {
-    taste = 6;
-  } else if ( (ADC_Wert > 415) && (ADC_Wert < 430) ) {
-    taste = 7;
-  } else if ( (ADC_Wert > 390) && (ADC_Wert < 400) ) {
-    taste = 8;
-  } else if ( (ADC_Wert > 360) && (ADC_Wert < 370) ) {
-    taste = 9;
+  if (IstTasteGedrueckt(ADC_Wert, 850)) {
+    return {0,2};
+  } else if (IstTasteGedrueckt(ADC_Wert, 730)) {
+    return {0,1};
+  } else if (IstTasteGedrueckt(ADC_Wert, 640)) {
+    return {0,0};
+  } else if (IstTasteGedrueckt(ADC_Wert, 565)) {
+    return {1,0};
+  } else if (IstTasteGedrueckt(ADC_Wert, 510)) {
+    return {1,1};
+  } else if (IstTasteGedrueckt(ADC_Wert, 465)) {
+    return {1,2};
+  } else if (IstTasteGedrueckt(ADC_Wert, 420)) {
+    return {2,2};
+  } else if (IstTasteGedrueckt(ADC_Wert, 395)) {
+    return {2,1};
+  } else if (IstTasteGedrueckt(ADC_Wert, 365)) {
+    return {2,0};
   }
   
-  if (DEBUG && taste)
-  {
-    Serial.print("Gemessener Wert: ");
-    Serial.print(ADC_Wert);
-    Serial.print(" - Gedrückte Taste: ");
-    Serial.println( taste );
-  }
-
-  return taste;
+  return {255,255};
 }
+
+bool IstTasteGedrueckt(int wert, int ziel)
+{
+  return wert > (ziel-10) && wert < (ziel+10);
+}
+

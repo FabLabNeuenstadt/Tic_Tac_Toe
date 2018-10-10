@@ -1,10 +1,10 @@
 #define BUTTON_PIN A7
-#define DEBUG 0
+#define DEBUG true
 
 struct RGB {
-  byte r;
-  byte g;
-  byte b;
+  byte R;
+  byte G;
+  byte B;
 };
 
 byte anodePin[3];
@@ -16,32 +16,35 @@ byte kathodeBPin[3];
 // Werte: 0 => Noch niemand das Feld belegt
 //        1 => Spieler 1 hat das Feld belegt
 //        2 => Spieler 2 hat das Feld belegt
-short Spielfeld[9];
+enum Spieler {
+  None = 0b00000000,
+  A = 0b00000001,
+  B = 0b00000010
+};
+Spieler Spielfeld[3][3]; // [x][y]
 
-RGB Ausgabe[10];
+RGB Bild[3][3];
 
-RGB FarbeSpieler[3];
+struct Koordinaten {
+  byte X;
+  byte Y;
 
-short AktiverSpieler = 0;
+  static bool Equals(Koordinaten *left, Koordinaten *right)
+  {
+    return left->X == right->X && left->Y == right->Y;
+  }
+  bool operator ==(Koordinaten right)
+  {
+      return Equals(this, &right);
+  }
+  bool operator !=(Koordinaten right)
+  {
+      return !Equals(this, &right);
+  }
+};
+Koordinaten KeineKoordinaten = {255,255};
 
-int TasteZuLED( int taste ) {
-    switch (taste) {
-      case 1: return 3;
-      case 2: return 2;
-      case 3: return 1;
-      case 4: return 4;
-      case 5: return 5;
-      case 6: return 6;
-      case 7: return 9;
-      case 8: return 8;
-      case 9: return 7;
-    }
-    return 0;
-}
-
-int TasteZuSpielfeld( int taste ) {
-  return TasteZuLED(taste)-1;
-}
+Spieler AktiverSpieler = Spieler::None;
 
 // Alle Pins, die mit den LEDs verbunden sind, auf Ausgang setzen
 void InitEA( void )
@@ -53,140 +56,72 @@ void InitEA( void )
   pinMode(A0, OUTPUT);
 }
 
-// Um alle LEDs auszuschalten, müssen die damit verbundenen Anoden auf HIGH (falls durch einen Transistor invertiert) bzw. LOW gesetzt werden.
-void AllesAus( void )
-{
-  // Anoden
-  for (int zeile = 0; zeile < 3; zeile++) {
-    digitalWrite(anodePin[zeile], HIGH);
-  }
-  // Anode für D10
-  digitalWrite(11, LOW);
-
-  // Kathoden
-  for (int spalte = 0; spalte < 3; spalte++) {
-    digitalWrite(kathodeRPin[spalte], HIGH);
-    digitalWrite(kathodeGPin[spalte], HIGH);
-    digitalWrite(kathodeBPin[spalte], HIGH);
-  }
-}
-
 //  Zu Beginn eines Spiels werden alle Variablen auf ihren Standardwert gesetzt
 void InitVariablen( void )
 {
-  // Alle Elemente des Arrays Spielfeld werden mit 0 belegt
-  for (int i = 0; i < 10; i++)
+  // Alle Elemente des Spielfelds werden mit 0 belegt
+  for (int x = 0; x < 3; x++)
   {
-    Spielfeld[i] = 0;
-    Ausgabe[i] = FarbeSpieler[0];
+    for (int y = 0; y < 3; y++)
+    {
+      Spielfeld[x][y] = Spieler::None;
+    }
   }
   
   // Wenn nichts anderweitig festgesetzt wurde, beginnt Spieler 1
-  if (!AktiverSpieler)
-  {
-    AktiverSpieler = 1;
-  }
-
+  AktiverSpieler = Spieler::A;
 }
-
-// Diese Funktion kümmert sich um die Ausgabe der Status-LED
-void AusgabeStatusLED( void )
-{
-  // Je nachdem, welcher Spieler gerade dran ist, leuchtet die LED in einer bestimmten Farbe
-  SetzeLED(10, FarbeSpieler[AktiverSpieler].r, FarbeSpieler[AktiverSpieler].g, FarbeSpieler[AktiverSpieler].b);
-}
-
-// Diese Funktion gibt den Inhalt des Arrays Ausgabe auf der LED Matrix aus.
-void AusgabeLEDs()
-{
-  // Da die LEDs im Vergleich zum Spielfeld um 90° gedreht sind, müssen wir hier ein wenig rechnen
-  for (int zeile = 0; zeile < 3; zeile++) {
-    SetzeZeile(zeile, Ausgabe[zeile], Ausgabe[zeile+3], Ausgabe[zeile+6]);
-  }
-}
-
-// Nach jedem Spielzug muss geprüft werden ob es einen Gewinner gibt
-// Dazu werden die Werte in dem Array zeilenweise, spaltenweise und diagonal multipliziert
-// Ein Produkt ist 1, genau dann wenn alle drei Faktoren 1 sind, alle Felder von Spieler 1 belegt wurden und dieser gewonnen hat.
-// Ein Produkt ist 8, genau dann wenn alle drei Faktoren 2 sind, alle Felder von Spieler 2 belegt wurden und dieser gewonnen hat.
 
 // Rückgabewerte:
-// -1 => Unentschieden
+// 255 => Unentschieden
 // 0  => Spiel läuft noch, niemand hat gewonnen
 // 1  => Spieler 1 hat gewonnen
 // 2  => Spieler 2 hat gewonnen
-
-int PruefeGewinner( void )
+Spieler PruefeGewinner()
 {
-  int Produkt = 1;
-
-  // Prüfe alle 3 Zeilen und Spalten
-  for(int i = 0; i < 3; i++)
+  // Spalten prüfen:
+  for(int x = 0; x < 3; x++)
   {
-    int Spalte = i;
-    Produkt = Spielfeld[ 0 + Spalte ] * Spielfeld[ 3 + Spalte ] * Spielfeld[ 6 + Spalte ];
-    if(Produkt == 1)
+    Spieler gewinner = Spielfeld[x][0] & Spielfeld[x][1] & Spielfeld[x][2];
+    if(gewinner != Spieler::None)
+      return gewinner;
+  }
+
+  // Zeilen prüfen:
+  for(int y = 0; y < 3; y++)
+  {
+    Spieler gewinner = Spielfeld[0][y] & Spielfeld[1][y] & Spielfeld[2][y];
+    if(gewinner != Spieler::None)
+      return gewinner;
+  }
+
+  // Diagonalen prüfen:
+  {
+    Spieler gewinner;
+    gewinner = Spielfeld[0][0] & Spielfeld[1][1] & Spielfeld[2][2];
+    if(gewinner != Spieler::None)
+      return gewinner;
+    gewinner = Spielfeld[0][2] & Spielfeld[1][1] & Spielfeld[2][0];
+    if(gewinner != Spieler::None)
+      return gewinner;
+  }
+
+  // Prüfe ob alle Felder gefüllt und dennoch kein Gewinner -> Unentschieden:
+  for(int x = 0; x < 3; x++)
+  {
+    for(int y = 0; y < 3; y++)
     {
-      return 1;
-    }
-    if(Produkt == 8)
-    {
-      return 2;
-    }
-    
-    int Zeile = i;
-    Produkt = Spielfeld [ 0 + Zeile * 3 ] * Spielfeld[ 1 + Zeile * 3 ] * Spielfeld[ 2 + Zeile * 3 ];
-    if(Produkt == 1)
-    {
-      return 1;
-    }
-    if(Produkt == 8)
-    {
-      return 2;
+      if(Spielfeld[x][y] == Spieler::None)
+        return 0;
     }
   }
-
-  // Prüfe die 2 Diagonalen
-  Produkt = Spielfeld[0] * Spielfeld[4] * Spielfeld[8];
-  if(Produkt == 1)
-  {
-    return 1;
-  }
-  if(Produkt == 8)
-  {
-    return 2;
-  }
-
-  Produkt = Spielfeld[2] * Spielfeld[4] * Spielfeld[6];
-  if(Produkt == 1)
-  {
-    return 1;
-  }
-  if(Produkt == 8)
-  {
-    return 2;
-  }
-
-  // Prüfe, ob alle Felder belegt sind. Dies ist genau dann der Fall, wenn keins der Felder 0 ist
-  // und somit das Produkt aller Felder nicht 0 ist
-  for(int feld = 0; feld < 9; feld++)
-  {
-    Produkt *= Spielfeld[feld];
-  }
-  if(Produkt != 0)
-  {
-    return -1;
-  }
-
-  return 0;
+  // Jedes Feld ist durch einen Spieler belegt, aber kein Gewinner steht fest:
+  return 255;
 }
 
 // Die Setup-Funktion wird beim ersten Start aufgerufen
-void setup() {
-  InitEA();
-  AllesAus();
-  InitVariablen();
-
+void setup()
+{
   // Kathoden der Spalten sind gleich
   kathodeRPin[0] = 12;
   kathodeRPin[1] =  8;
@@ -202,86 +137,69 @@ void setup() {
   anodePin[0] = 10;
   anodePin[1] =  9;
   anodePin[2] =  6;
-
-  FarbeSpieler[0].r =   0;
-  FarbeSpieler[0].g =   0;
-  FarbeSpieler[0].b =   0;
-
-  FarbeSpieler[1].r = 255;
-  FarbeSpieler[1].g =   0;
-  FarbeSpieler[1].b =   0;
-
-  FarbeSpieler[2].r =   0;
-  FarbeSpieler[2].g = 255;
-  FarbeSpieler[2].b =   0;
+  
+  InitEA();
+  InitVariablen();
+  LedAusgabe();
 
   if (DEBUG)
   {
     Serial.begin(9600);
+    Serial.println("Hallo vom TicTacToe!");
   }
 }
 
 // Die Loop Funktion wird endlos durchlaufen
-void loop() {
-
-  // ermittle, ob eine Taste gedrückt wurde
-  int Taste = TasteGedrueckt();
-  int Gewinner;
-
-  // Falls eine Taste gedrückt wurde und dieses Feld noch unbelegt ist, markiere es mit dem aktuellen Spieler
-  if ((Taste) && (Spielfeld[ TasteZuSpielfeld(Taste) ] == 0))
+void loop()
+{
+  Koordinaten taste = TasteGedrueckt();
+  if (taste != KeineKoordinaten && Spielfeld[taste.X][taste.Y] == Spieler::None && AktiverSpieler != Spieler::None)
   {
-    Spielfeld[ TasteZuSpielfeld(Taste) ] = AktiverSpieler;
-    Ausgabe[ TasteZuSpielfeld(Taste) ] = FarbeSpieler[AktiverSpieler];
-
-    // Nach jedem gültigen Spielzug ist der neue Spieler an der Reihe. Dafür wird der Spieler zuerst inkrementiert und danach ein Überlauf geprüft
-    AktiverSpieler++;
-    if (AktiverSpieler > 2)
+    if(DEBUG)
     {
-      AktiverSpieler = 1;
+      Serial.print("Taste gedrückt:");
+      Serial.print(taste.X);
+      Serial.println(taste.Y);
     }
+    
+    // Der Platz der gedrückten Taste auf dem Spielfeld ist noch frei
+    // -> Belegen des Platzes mit dem aktuellen Spieler.
+    Spielfeld[taste.X][taste.Y] = AktiverSpieler;
 
-    if (DEBUG)
+    // nächsten aktiven Spieler auswählen:
+    if (AktiverSpieler == Spieler::A)
     {
-      Serial.println("Spielfeld:");
-      for(int feld = 0; feld < 9; feld++)
-      {
-        if (feld%3 == 2) {
-          // Wir sind am Ende einer Zeile
-          Serial.println(Spielfeld[feld]);
-        } else {
-          Serial.print(Spielfeld[feld]);
-        }
-      }
-      Serial.print("Aktiver Spieler: ");
-      Serial.println(AktiverSpieler);
+      AktiverSpieler = Spieler::B;
+    }
+    else
+    {
+      AktiverSpieler = Spieler::A;
     }
   }
 
-
-  // An der Status-LED wird gezeigt, welcher Spieler gerade an der Reihe ist
-  AusgabeStatusLED();
-
-  // Der aktuelle Spielstand wird auf der LED Matrix ausgegeben
-  AusgabeLEDs();
+  ZeigeSpielfeld();
+  AusgabeStatusLED(); // An der Status-LED wird gezeigt, welcher Spieler gerade an der Reihe ist
 
   // Es wird geprüft, ob es schon einen Gewinner gibt
-  Gewinner = PruefeGewinner();
-
-  if (DEBUG && Gewinner)
-  {
-    Serial.print("Status Gewinner: ");
-    Serial.println(Gewinner);
-  }
+  Spieler Gewinner = PruefeGewinner();
 
   // Aktiviere passende Animation, falls das Spiel durch Sieg oder Unentschieden beendet wurde
-  if(Gewinner > 0)
+   if(Gewinner != Spieler::None)
   {
-    SpielGewonnen(Gewinner);
+    if(DEBUG)
+    {
+      Serial.print("Gewinner:");
+      Serial.println(Gewinner);
+    }
+    
+    AktiverSpieler = Spieler::None;
+    if(Gewinner > 0) // es gibt einen Gewinner
+    {
+      SpielGewonnen(Gewinner);
+    }
+    else // Spiel läuft nicht mehr es gibt aber auch keinen Gewinner
+    {
+      SpielUnentschieden();
+    }
   }
-  else if(Gewinner == -1)
-  {
-    SpielUnentschieden();
-  }
-
 }
