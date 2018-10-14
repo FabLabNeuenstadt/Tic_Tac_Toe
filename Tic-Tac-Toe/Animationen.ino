@@ -1,4 +1,4 @@
-Spieler Gewinner;
+int Gewinner;
 
 void ZeigeAnimation(void (*Animation)(byte Schritt), byte SchrittZahl, unsigned long SchrittDauer = 250)
 {
@@ -53,7 +53,7 @@ void GewonnenAnimation(byte Schritt)
     }
 }
 
-void SpielGewonnen(Spieler gewinner)
+void SpielGewonnen(int gewinner)
 {
   Gewinner = gewinner;
   ZeigeAnimation(GewonnenAnimation, 3);

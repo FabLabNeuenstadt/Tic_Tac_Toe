@@ -1,12 +1,6 @@
 #ifndef Spiel_h
 #define Spiel_h
 
-enum Spieler {
-  None = 0b00000000,
-  A = 0b00000001,
-  B = 0b00000010
-};
-
 struct Koordinaten {
   byte X;
   byte Y;

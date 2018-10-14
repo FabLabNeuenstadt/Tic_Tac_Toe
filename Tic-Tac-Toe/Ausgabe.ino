@@ -1,10 +1,10 @@
-RGB GetSpielerfarbe(Spieler spieler)
+RGB GetSpielerfarbe(int spieler)
 {
   switch(spieler)
   {
-  case Spieler::None: return RGB {0,0,0};
-  case Spieler::A: return RGB {255,0,0};
-  case Spieler::B: return RGB {0,255,0};
+  case 0: return RGB {0,0,0};
+  case 1: return RGB {255,0,0};
+  case 2: return RGB {0,255,0};
   }
 }
 
