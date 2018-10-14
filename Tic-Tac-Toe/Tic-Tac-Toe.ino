@@ -4,33 +4,38 @@
 #include "Ausgabe.h"
 #include "Spiel.h"
 
-// Werte: 0 => Noch niemand hat das Feld belegt
-//        1 => Spieler 1 hat das Feld belegt
-//        2 => Spieler 2 hat das Feld belegt
+/*
+ * Spielfeldwerte:
+ *    0 => Noch niemand hat das Feld belegt
+ *    1 => Spieler 1 hat das Feld belegt
+ *    2 => Spieler 2 hat das Feld belegt
+ */
 
-int Spielfeld[3][3]; // [x][y]
+int Spielfeld[3][3]; // [Zeile][Spalte]
 int AktiverSpieler = 0;
 
 //  Zu Beginn eines Spiels werden alle Variablen auf ihren Standardwert gesetzt
 void ResetSpiel( void )
 {
   // Alle Elemente des Spielfelds werden mit 0 belegt
-  for (int x = 0; x < 3; x++)
+  for (int Zeile = 0; Zeile < 3; Zeile++)
   {
-    for (int y = 0; y < 3; y++)
+    for (int Spalte = 0; Spalte < 3; Spalte++)
     {
-      Spielfeld[x][y] = 0;
+      Spielfeld[Zeile][Spalte] = 0;
     }
   }
   
   AktiverSpieler = 1; // Spieler 1 beginnt
 }
 
-// Rückgabewerte:
-// 255 => Unentschieden
-// 0  => Spiel läuft noch, niemand hat gewonnen
-// 1  => Spieler 1 hat gewonnen
-// 2  => Spieler 2 hat gewonnen
+/*
+ * Rückgabewerte:
+ * 255 => Unentschieden
+ * 0  => Spiel läuft noch, niemand hat gewonnen
+ * 1  => Spieler 1 hat gewonnen
+ * 2  => Spieler 2 hat gewonnen
+ */
 int PruefeGewinner()
 {
   // Wir multiplizieren die Werte aller Zeilen, Spalten und Diagonalen.
@@ -50,9 +55,12 @@ int PruefeGewinner()
   for (int Zaehler = 0; Zaehler < 3; Zaehler++) {
     // Spalte überprüfen
     Produkt = Spielfeld[Zaehler][0] * Spielfeld[Zaehler][1] * Spielfeld[Zaehler][2];
-    if (Produkt == 1) {
+    if (Produkt == 1)
+    {
       return 1;
-    } else if (Produkt == 8) {
+    }
+    else if (Produkt == 8)
+    {
       return 2;
     }
     
@@ -61,9 +69,12 @@ int PruefeGewinner()
 
     // Zeile überprüfen
     Produkt = Spielfeld[0][Zaehler] * Spielfeld[1][Zaehler] * Spielfeld[2][Zaehler];
-    if (Produkt == 1) {
+    if (Produkt == 1)
+    {
       return 1;
-    } else if (Produkt == 8) {
+    }
+    else if (Produkt == 8)
+    {
       return 2;
     }
 
@@ -72,24 +83,33 @@ int PruefeGewinner()
   // Diagonalen überprüfen
   {
     Produkt = Spielfeld[0][0] * Spielfeld[1][1] * Spielfeld[2][2];
-    if (Produkt == 1) {
+    if (Produkt == 1)
+    {
       return 1;
-    } else if (Produkt == 8) {
+    }
+    else if (Produkt == 8)
+    {
       return 2;
     }
     
     Produkt = Spielfeld[0][2] * Spielfeld[1][1] * Spielfeld[2][0];
-    if (Produkt == 1) {
+    if (Produkt == 1)
+    {
       return 1;
-    } else if (Produkt == 8) {
+    }
+    else if (Produkt == 8)
+    {
       return 2;
     }
   }
 
-  if (GesamtProdukt == 0) {
+  if (GesamtProdukt == 0)
+  {
     // Mindestens ein Feld wurde noch nicht besetzt
     return 0;
-  } else {
+  }
+  else
+  {
     // Alle Felder wurden besetzt und weil wir im Code an diese Stelle gelangt sind,
     // hat niemand gewonnen, folglich ist die Runde unentschieden
     return 255;
