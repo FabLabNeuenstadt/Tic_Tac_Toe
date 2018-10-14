@@ -68,23 +68,7 @@ void loop()
   // Es wird geprüft, ob es schon einen Gewinner gibt
   int Gewinner = PruefeGewinner();
 
-  // Aktiviere passende Animation, falls das Spiel durch Sieg oder Unentschieden beendet wurde
-  if(Gewinner != 0)
-  {
-    if(DEBUG)
-    {
-      Serial.print("Gewinner:");
-      Serial.println(Gewinner);
-    }
-    
-    AktiverSpieler = 0;
-    if((Gewinner > 0) && (Gewinner <= 2)) // es gibt einen Gewinner
-    {
-      SpielGewonnen(Gewinner);
-    }
-    else // Spiel läuft nicht mehr es gibt aber auch keinen Gewinner
-    {
-      SpielUnentschieden();
-    }
-  }
+  //TODO: Aktiviere passende Animation, falls das Spiel beendet wurde
+  //      Gewinner: Animation mit der Funktion SpielGewonnen(Gewinner) abspielen
+  //      Unentschieden: Animation mit der Funktion SpielUnentschieden() abspielen
 }
