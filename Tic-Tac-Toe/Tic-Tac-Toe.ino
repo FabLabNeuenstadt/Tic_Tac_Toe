@@ -17,16 +17,9 @@ int AktiverSpieler = 0;
 //  Zu Beginn eines Spiels werden alle Variablen auf ihren Standardwert gesetzt
 void ResetSpiel( void )
 {
-  // Alle Elemente des Spielfelds werden mit 0 belegt
-  for (int Zeile = 0; Zeile < 3; Zeile++)
-  {
-    for (int Spalte = 0; Spalte < 3; Spalte++)
-    {
-      Spielfeld[Zeile][Spalte] = 0;
-    }
-  }
-  
-  AktiverSpieler = 1; // Spieler 1 beginnt
+  //TODO: Alle Elemente des Spielfelds werden mit 0 belegt
+
+  //TODO: Variable AktiverSpieler setzen  
 }
 
 /*
@@ -38,82 +31,8 @@ void ResetSpiel( void )
  */
 int PruefeGewinner()
 {
-  // Wir multiplizieren die Werte aller Zeilen, Spalten und Diagonalen.
-  // 
-  // Wenn einer der Ergebniswerte 1 ist, wissen wir, dass alle 3 Werte 1 waren
-  // (1*1*1) und somit Spieler 1 gewonnen hat
-  //
-  // Wenn einer der Ergebniswerte 8 ist, wissen wir, dass alle 3 Werte 2 waren
-  // (2*2*2) und somit Spieler 2 gewonnen hat
-  //
-  // Wenn alle Ergebnisse einer Zeile oder Spalte miteinander multipliziert
-  // einen Wert != 0 ergeben, wissen wir, dass alle Felder belegt sind
-
-  int GesamtProdukt = 1;
-  int Produkt = 1;
-  
-  for (int Zaehler = 0; Zaehler < 3; Zaehler++) {
-    // Spalte überprüfen
-    Produkt = Spielfeld[Zaehler][0] * Spielfeld[Zaehler][1] * Spielfeld[Zaehler][2];
-    if (Produkt == 1)
-    {
-      return 1;
-    }
-    else if (Produkt == 8)
-    {
-      return 2;
-    }
-    
-    // Wir multiplizieren alle Werte aller Spalten miteinander
-    GesamtProdukt = GesamtProdukt * Produkt;
-
-    // Zeile überprüfen
-    Produkt = Spielfeld[0][Zaehler] * Spielfeld[1][Zaehler] * Spielfeld[2][Zaehler];
-    if (Produkt == 1)
-    {
-      return 1;
-    }
-    else if (Produkt == 8)
-    {
-      return 2;
-    }
-
-  }
-
-  // Diagonalen überprüfen
-  {
-    Produkt = Spielfeld[0][0] * Spielfeld[1][1] * Spielfeld[2][2];
-    if (Produkt == 1)
-    {
-      return 1;
-    }
-    else if (Produkt == 8)
-    {
-      return 2;
-    }
-    
-    Produkt = Spielfeld[0][2] * Spielfeld[1][1] * Spielfeld[2][0];
-    if (Produkt == 1)
-    {
-      return 1;
-    }
-    else if (Produkt == 8)
-    {
-      return 2;
-    }
-  }
-
-  if (GesamtProdukt == 0)
-  {
-    // Mindestens ein Feld wurde noch nicht besetzt
-    return 0;
-  }
-  else
-  {
-    // Alle Felder wurden besetzt und weil wir im Code an diese Stelle gelangt sind,
-    // hat niemand gewonnen, folglich ist die Runde unentschieden
-    return 255;
-  }
+  //TODO: Überprüfen, ob es einen Gewinner gibt und den Rückgabewert entsprechend
+  //      der obigen Definition auswählen
 }
 
 // Die Setup-Funktion wird beim ersten Start aufgerufen
@@ -134,32 +53,17 @@ void setup()
 void loop()
 {
   Koordinaten taste = TasteGedrueckt();
-  if (taste != KeineKoordinaten && Spielfeld[taste.X][taste.Y] == 0 && AktiverSpieler != 0)
-  {
-    if(DEBUG)
-    {
-      Serial.print("Taste gedrückt:");
-      Serial.print(taste.X);
-      Serial.println(taste.Y);
-    }
-    
-    // Der Platz der gedrückten Taste auf dem Spielfeld ist noch frei
-    // -> Belegen des Platzes mit dem aktuellen Spieler.
-    Spielfeld[taste.X][taste.Y] = AktiverSpieler;
+  // Die Variable taste hat nun 2 mögliche Zustände:
+  // Entweder gilt (taste == KeineKoordinaten), dann wurde keine Taste gedrückt
+  // Oder über taste.X und taste.Y kann die gedrückte Taste herausgefunden werden.
+  
+  //TODO: Überprüfen, ob eine Taste gedrückt wurde und ob das Feld der
+  //      gedrückten Taste bereits belegt ist.
+  //      Wenn ja, Feld entsprechend besetzen und aktiven Spieler wechseln
 
-    // nächsten aktiven Spieler auswählen:
-    if (AktiverSpieler == 1)
-    {
-      AktiverSpieler = 2;
-    }
-    else
-    {
-      AktiverSpieler = 1;
-    }
-  }
-
+  // Diese Funktionen sind für die Ausgabe des Spielfelds und des aktiven Spielers zuständig
   ZeigeSpielfeld();
-  AusgabeStatusLED(); // An der Status-LED wird gezeigt, welcher Spieler gerade an der Reihe ist
+  AusgabeStatusLED();
 
   // Es wird geprüft, ob es schon einen Gewinner gibt
   int Gewinner = PruefeGewinner();
