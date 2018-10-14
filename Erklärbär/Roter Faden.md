@@ -15,8 +15,11 @@ Basics:
 Wichtig: Abstraktion, generische Vorgehensweise
 
 Computer machen grundsätzlich das gleiche wie ihr mit dem Taschenrechner, nur unglaublich schnell
+
 1 GHz => 1 Milliarde (1 mit 9 Nullen!) Takte pro Sekunde
+
 Mein Telefon: Quad Core, 2x 2,2 GHz, 2x 1,6 GHz, also (theoretisch 7,6e9) mit vielen Abstraktionsebenen
+
 Arduino Nano (den wir später programmieren): 16 MHz, viel weniger, aber immerhin noch 1,6e7 Takte pro Sekunde, aber dafür wenig Abstraktionsebenen
 
 
@@ -98,10 +101,11 @@ Funktionen können sich selbst aufrufen. Aber Achtung, Endlosschleifengefahr!
 
 ### Allgemein
 
-Groß/Kleinschreibung ist wichtig: Zahl ist nicht gleich zahl.
+Groß/Kleinschreibung ist wichtig: `Zahl` ist nicht gleich `zahl`.
+
 Bitte auf Umlaute, Sonderzeichen in Funktions- und Variablennamen verzichten. Idealerweise nur a-zA-Z.
 
-Jeder Befehl wird durch ein ; abgeschlossen.
+Jeder Befehl wird durch ein `;` abgeschlossen.
 
 ```C++
 zahl = zahl + 10;
@@ -114,7 +118,9 @@ Programmierer fangen bei `0` an zu zählen, nicht bei `1`.
 ### Kommentare
 
 Kommentare sind Briefe an euch selbst in der Zukunft.
+
 Kommentare sollen beschreiben, warum Code etwas tut und nicht, was Code tut.
+
 ```C++
 Befehl1; // Alles nach zwei Schrägstrichen wird für den Ablauf ignoriert
 
@@ -127,7 +133,7 @@ Alles, was zwischen Schrägstrich Stern und Stern Schrägstrich steht, wird für
 ### Variablen
 Variablen müssen definiert (deklariert) werden.
 
-Der Übersicht halber gesammelt. Globale, lokale Variablen. Faustregel: So wenig globale Variablen wie möglich.
+Der Übersicht halber gesammelt deklarieren. Globale, lokale Variablen. Faustregel: So wenig globale Variablen wie möglich.
 
 Verschiedene wichtige Variablentypen:
 ```C++
